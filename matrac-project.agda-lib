@@ -1,0 +1,4 @@
+name: matrac-project
+include:
+  agda-stdlib/src
+  src
