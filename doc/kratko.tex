@@ -1,0 +1,42 @@
+\documentclass{article}
+\usepackage{unicode-math}
+\usepackage{enumerate}
+\usepackage[backend=biber]{biblatex}
+\bibliography{kratko.bib}
+\begin{document}
+\section{Formalization of sheaf forcing}
+Defining a sheaf topos in a proof assistant is a difficult task.
+The main problem is, that the nature of a topology is very impredicative, so it does not lend itself to formalization efforts, so the original description of the project was sparse.
+
+However, certain topological spaces sidestep the issues above entirely, and they are in general very disconnected. The Cantor space $2^ℕ$ is one such space, and so is the Baire space $ℕ^ℕ$.
+The topologies of these are such that any open cover can be refined to a partition, so the sheaf gluing axioms become trivial (there are no intersections to verify) and thus computers can work with them.
+
+Therefore the current goals are to work along with \cite{coquand,dialogue}
+to show that a certain class of functions is continuous, and in particular this
+yields an algorithm which computes the modulus of convergence for these funcitons.
+
+\section{Goals}
+
+I have in mind the following checkpoints, that may also serve as good endpoints for the project,
+depending on how much time it will take to complete:
+\begin{enumerate}[(1)]
+	\item\label{cat} Define the category of sheaves over $2^ℕ$
+	\item\label{forcing} Define sheaf forcing
+	\item\label{syst} Define/interpret Gödel's System T
+	\item\label{cont} Show that System T definable $2^ℕ → ℕ$ functions are uniformly continuous
+	\item\label{baire} Extend \ref{cat} and \ref{forcing} to $ℕ^ℕ$
+	\item Show the proof of \ref{cont} doesn't apply to \ref{baire}
+	\item Prove \ref{cont} for \ref{baire} in the non-uniform case
+\end{enumerate}
+
+I plan to use the libraries agda-stdlib\cite{stdlib}, agda-categories\cite{catlib}, and also TypeTopology\cite{tytop} if absolutely necessary.
+
+In case there are significant issues to defining the category itself, I will attempt to directly describe forcing without mentioning sheaves, as is (I believe) done in \cite{coquand}.
+
+The description of the objects of interest in the Cantor space case is sufficiently finite
+(it is precisely finite binary trees), so that computers can easily compute with them,
+however the Baire space the trees are not finitely branching (there is a branch for each natural number) so I believe more care needs to be taken to define them correctly.
+
+
+\printbibliography
+\end{document}
