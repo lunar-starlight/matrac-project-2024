@@ -4,3 +4,6 @@
 [submodule "TypeTopology"]
 	path = TypeTopology
 	url = git@github.com:martinescardo/TypeTopology.git
+[submodule "agda-categories"]
+	path = agda-categories
+	url = git@github.com:agda/agda-categories.git

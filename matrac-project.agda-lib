@@ -1,4 +1,5 @@
 name: matrac-project
 include:
   agda-stdlib/src
+  agda-categories/src
   src
