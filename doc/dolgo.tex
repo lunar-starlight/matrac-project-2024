@@ -88,15 +88,47 @@ evaluate, so it is the modulus of continuity for \(F\).
 
 \section{Formalization of sheaf forcing}
 
+I have not yet found a satisfying solution to the issues at hand.
+The partitions have a natural tree structure, but if I define them like trees I
+can't index over the elements of the partition, which becomes a problem.
 
+I expect to solve this to some extent in the coming weeks, but for now I can't
+write anything here.
 
+\subsection{System T}
+Currently I have implemented System T as an ordinary typed lambda calculus with
+two inductive types: the natural numbers and the booleans. One possible
+simplification is to define it as an \(\mathrm{SK}\) calculus (with those same
+types), as is done in\cite{dialogue}, but I personally prefer the lambda
+calculus.
+Currently the lambda calculus uses call-by-name semantics, though using
+fine-grained call-by-value semantics seem like a significant improvement.
+However, often the biggest issue in proving theorems is substitutions, and
+fine-grained call-by-value semantics don't help with that.
 
+\subsection{Cantor space}
+There is actually no definition of the Cantor space or its opens in the project.
+This is because we have extracted the essence of the continuity the space
+provides with regards to forcing, and now represent it with condition sets and
+their partitions. Currently these are defined as lists of number-boolean pairs
+and trees respectively.
 
+The definition of condition sets is quite adequate, insofar as I have never had
+to explicitly manipulate them, but the definition of partitions is lacking. The
+tree structure imposes a tree structure to the computation of normal forms,
+which is probably undesirable. More importantly though, the tree structure does
+not expose any way to allow me to talk about for example terms \(tᵢ\) for every
+\(pᵢ\) in the partition. Further work is needed to verify whether it is possible
+to also encode the partitions as finite lists, and to find a way to reasonably
+iterate over them.
+
+There is some concern that this will still produce inadequate results because
+lists are ordered, but this has not been an issue for condition sets, and I hope
+it will not be an issue for the partitions either.
 
 \section{Goals}
 
-I have the following checkpoints in mind, and they may also serve as good endpoints for the project,
-depending on how much time it will take to complete:
+In the beginning I had the following checkpoints in mind:
 \begin{enumerate}[(1)]
 	\item\label{cat} Define the category of sheaves over $2^ℕ$
 	\item\label{forcing} Define sheaf forcing
@@ -107,17 +139,16 @@ depending on how much time it will take to complete:
 	\item Prove \ref{cont} for \ref{baire} in the non-uniform case
 \end{enumerate}
 
-I plan to use the libraries agda-stdlib\cite{stdlib}, agda-categories\cite{catlib}, and also TypeTopology\cite{tytop} if absolutely necessary.
+Trying to define the category is too difficult, but \ref{syst} didn't present
+any issues, though an alternative approach might have been better. As mentioned
+above, defining sheaf forcing is currently a significant issue, however I have
+written down the proof/algorithm that computes the modulus of continuity,
+assuming I can formulate forcing in such a way that allows me to compute normal
+forms.
 
-In case there are significant issues to defining the category itself,
-I will attempt to directly describe forcing without mentioning sheaves,
-as is (I believe) done in \cite{coquand}.
-
-The description of the objects of interest in the Cantor space case is sufficiently finite
-(it is precisely finite binary trees), so that computers can easily compute with them,
-however the Baire space the trees are not finitely branching
-(there is a branch for each natural number) so I believe more care needs
-to be taken to define them correctly.
+Since I've already encountered significant difficulties and have spent a
+sufficient amount of time on the binary case I will not attempt to complete
+the three checkpoints.
 
 \printbibliography
 \end{document}
