@@ -6,25 +6,32 @@
 \def\generic{\texttt{generic}}
 \def\natrec{\texttt{natrec}}
 \def\boolrec{\texttt{boolrec}}
+\def\zero{\texttt{zero}}
+\def\suc{\texttt{succ}}
 \begin{document}
 
 \section{Mathematical preliminaries}
-
 The idea is to show that every System T definable functional \(2^ℕ → 2\) is
 continuous (under the usual compact-open topology).
 
 \subsection{System T}
-System T was introduced by Kurt Gödel in TODO: year and citation. It has
-multiple presentations, but it is essentially a typed lambda calculus with a
-natural numbers type (denoted \(N\)). Specifically we have the following term forming rules:
+System T was introduced by Kurt Gödel in 1958 for the purposes of the so-called
+Dialectica interpretation\cite{dialectica}. It has multiple presentations, but it is essentially
+a typed lambda calculus with a natural numbers type (denoted \(N\)).
+
+We read the sequent \(Γ ⊢ t : T\) as ``in the context \(Γ\), the term \(t\) (is
+well-formed and) has type \(T\)'', where a context is a list of variables and
+their types. If the context is not relevant I will ommit it.
+
+Specifically we have the following term forming rules:
 \begin{itemize}
 \item Variables: We have an infinite set of variables, usually denoted by \(x\),
   \(y\), … They form terms \(Γ, x : A ⊢ x : A\).
 \item Lambda abstraction: For each term \(Γ, x : A ⊢ t : B\) we have a term
   \(Γ ⊢ λx. t : A → B\).
 \item Application: For terms \(t : A → B\) and \(u : A\) we have a term \(t(u) : B\).
-\item Zero: \(0 : N\) is a term.
-\item Successor: For each term \(t : N\) we have it's successor \(succ(t) : N\).
+\item Zero: \(\zero : N\) is a term.
+\item Successor: For each term \(t : N\) we have it's successor \(\suc(t) : N\).
 \item Induction principle: For terms \(t₀ : B\) (base case), \({tₛ : N → B → B}\)
   (successor case), and natural number term \(t : N\) we have the term
   \({\natrec(t₀, tₛ, t) : B}\), which is obtained by induction on \(t\).
@@ -34,6 +41,19 @@ This can be extended by adding boolean values (and a boolean induction
 principle) without changing the expressive strength of the system, since we can
 encode booleans in the natural numbers.
 This will be useful for talking about the functionals we are interested in.
+
+The computaton rules are fairly standard for a call-by-name lambda calculus:
+\begin{itemize}
+\item For application, if the first term can make a step we make it, otherwise
+  we substitute the second term.
+\item For the successor, if the term inside can make a step we make it.
+\item For induction, if the term we are doing induction on can step we make it,
+  otherwise it's either zero or a successor, so we can step into the base or
+  successor cases respectively.
+\item For induction on booleans the same as above, except we compute to true
+  or false, in which case we apply the true or false case repsectively.
+\end{itemize}
+
 
 \subsection{Topology}
 The space \(2^ℕ\) is called the Cantor space. With the compact-open topology
@@ -70,13 +90,12 @@ Intuitively, if we want it to behave as a generic element, we should be able to
 inspect both branches of evaluation. We can handle this by splitting our
 condition set by adding the conditions \((n, 0)\) and \((n, 1)\) to each of the
 branches, and then continue to evaluate both branches. To keep track of
-branches, we can say that if we have \(p ⊩ generic(n)\), and \(n\) is not in the
+branches, we can say that if we have \(p ⊩ \generic(n)\), and \(n\) is not in the
 condition set, evaluate the expression to a formal sum \(p₀ ⊩ 0 + p₁ ⊩ 1\).
 In general, if \(pᵢ\) is some partition of \(p\), and \(t\) evaluates to \(tᵢ\)
 on those partitions, then \(p ⊩ t\) evaluates to \(∑ᵢ pᵢ ⊩ tᵢ\).
 
 \subsection{The proof}
-
 The idea of the proof is as follows.
 Suppose we have a System T defined functional \(F\). Then we evaluate it on the
 generic element in an empty context. By some lemmas we can show this has a
@@ -149,6 +168,10 @@ forms.
 Since I've already encountered significant difficulties and have spent a
 sufficient amount of time on the binary case I will not attempt to complete
 the three checkpoints.
+
+Since \ref{cont} is mostly finished, up to renaming or relabeling of variables,
+I will set just the checkpoints \ref{forcing}, \ref{syst}, and \ref{cont} as my
+goal. I sincerely hope to complete this by the defense date.
 
 \printbibliography
 \end{document}
