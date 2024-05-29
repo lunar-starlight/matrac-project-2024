@@ -5,3 +5,5 @@ The main goal of this project was to use a forcing relation to compute a modulus
 A further goal I set was to generalize this construction to functionals on the Baire space, i. e. of the form \((ℕ → ℕ) → ℕ\).
 
 I mostly tried to follow Coquand's paper "A Computational Interpretation of Forcing in Type Theory".
+
+A longer description can be found in [doc/dolgo.pdf](doc/dolgo.pdf).
