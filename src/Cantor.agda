@@ -17,8 +17,6 @@ open import Function
 open import Agda.Builtin.Equality
 open import Relation.Binary.PropositionalEquality as PE
   using (cong; trans; sym; inspect)
---open import Agda.Builtin.Sigma
---  using (Σ)
 
 open import Relation.Nullary.Decidable
   using (Dec; _because_; ¬?; yes; no) renaming (map to decmap)
@@ -72,6 +70,9 @@ record Cond : Set where
     is-cond : cond? carrier
 open Cond
 
+∅ : Cond
+∅ = cond [] nil
+
 infix 4 _∈_ _∉_ _∈?_ _∉?_
 
 ‖_‖ : Cond → Carrier
@@ -112,11 +113,6 @@ cond-union p q α =
     union-carrier (x ∷ ‖p‖) ‖q‖ with (proj₁ x) ∈'? ‖q‖
     ... | no  _ = x ∷ union-carrier ‖p‖ ‖q‖
     ... | yes _ =     union-carrier ‖p‖ ‖q‖
-
-    --union-carrier ‖p‖ [] = ‖p‖
-    --union-carrier ‖p‖ (y ∷ ‖q‖) with (proj₁ y) ∈'? ‖p‖
-    --... | false because _ = y ∷ union-carrier ‖p‖ ‖q‖
-    --... | true  because _ =     union-carrier ‖p‖ ‖q‖
 
     ∉-union-carrier : {n : ℕ} → {‖p‖ ‖q‖ : Carrier} → (n ∉' ‖p‖) → (n ∉' ‖q‖) → n ∉' union-carrier ‖p‖ ‖q‖
     ∉-union-carrier {n} {[]}             {‖q‖} n∉[] n∉q = n∉q
@@ -192,11 +188,18 @@ add-cond-preserves-≼ : {p q : Cond} → {n : ℕ} → {b : Bool}
 add-cond-preserves-≼ q≼p n (here refl) = here refl , refl
 add-cond-preserves-≼ q≼p m (there m∈p) = there (≼∈ q≼p m∈p) , ≼-preserves-lookup q≼p m∈p
 
-add-cond-preserves-≼' : {p q : Cond} → {n : ℕ} → {b : Bool}
+add-cond-preserves-≼ʳ : {p q : Cond} → {n : ℕ} → {b : Bool}
                      → {n∉p : n ∉ p} → (n∈q : n ∈ q) → (lookup q n n∈q ≡ b)
                      → q ≼ p → q ≼ add-cond n b p n∉p
-add-cond-preserves-≼' n∈q eq q≼p n (here refl) = n∈q , (sym eq)
-add-cond-preserves-≼' n∈q eq q≼p m (there m∈p) = ≼∈ q≼p m∈p , ≼-preserves-lookup q≼p m∈p 
+add-cond-preserves-≼ʳ n∈q eq q≼p n (here refl) = n∈q , (sym eq)
+add-cond-preserves-≼ʳ n∈q eq q≼p m (there m∈p) = ≼∈ q≼p m∈p , ≼-preserves-lookup q≼p m∈p 
+
+add-cond-preserves-≼ˡ : {p q : Cond} → {n : ℕ} → {b : Bool}
+                     → {n∉q : n ∉ q} → q ≼ p → add-cond n b q n∉q ≼ p
+add-cond-preserves-≼ˡ q≼p m m∈p = there (≼∈ q≼p m∈p) , ≼-preserves-lookup q≼p m∈p
+
+≼-refl : {p : Cond} → p ≼ p
+≼-refl _ n∈p = n∈p , refl
 
 ≼-trans : {p q r : Cond} → r ≼ q → q ≼ p → r ≼ p
 ≼-trans {p} {q} {r} r≼q q≼p n n∈p = n∈r , trans-lookup
@@ -210,61 +213,8 @@ add-cond-preserves-≼' n∈q eq q≼p m (there m∈p) = ≼∈ q≼p m∈p , �
         (proj₂ (q≼p n n∈p))
         (proj₂ (r≼q n (proj₁ (q≼p n n∈p))))
 
-{-
-data _≼_ : (p q : Cond) → Set where
-  rfl : (p : Cond) → p ≼ p
-  ext : (p : Cond) → (n : ℕ) → (b : Bool) → (q : Cond) → (n∉q : n ∉ q) → q ≼ p
-      → add-cond n b q n∉q ≼ p
-
-∈-prop : (p : Cond) → {n : ℕ} → (α β : n ∈ p) → α ≡ β
-∈-prop _ (here refl) (here refl) = refl
-∈-prop (cond _ (add _ _ _ _ n∉p)) (here refl) (there β)
-  = ⊥-elim (n∉p β)
-∈-prop (cond _ (add _ _ _ _ n∉p)) (there α) (here refl)
-  = ⊥-elim (n∉p α)
-∈-prop (cond (_ ∷ xs) (add _ _ .xs cond?xs _)) (there α) (there β)
-  = cong there (∈-prop (cond xs cond?xs) α β)
-
-≼∈ : {p q : Cond} → (q≼p : q ≼ p) → {n : ℕ} → n ∈ p → n ∈ q
-≼∈ (rfl _) n∈p = n∈p
-≼∈ (ext _ _ _ _ _ q≼p) n∈p = there (≼∈ q≼p n∈p)
-
-≼-matching : {p q : Cond} → q ≼ p → cond-matching p q
-≼-matching {p} {.p} (rfl .p) = λ n α β → cong (λ γ → lookup p n γ) (∈-prop p α β)
-≼-matching (ext _ n _ _ n∉q q≼p) m α β with m ≡? n
-...                                          | yes refl = ⊥-elim (n∉q (≼∈ q≼p α))
-≼-matching _ _ α (here refl)                 | no ¬⊤ = ⊥-elim (¬⊤ refl)
-≼-matching (ext _ _ _ _ _ q≼p) m α (there β) | no _ rewrite ≼-matching q≼p m α β = refl
-
-≼-preserves-lookup : {p q : Cond} → (q≼p : q ≼ p) → (n : ℕ) → (n∈p : n ∈ p)
-                   → lookup p n n∈p ≡ lookup q n (≼∈ q≼p n∈p)
-≼-preserves-lookup (rfl _) n n∈p = refl
-≼-preserves-lookup (ext _ m b q m∉q q≼p) n (here refl)
-  with ≼∈ q≼p (here refl)
-... | here refl = ≼-matching q≼p n (here refl) (here refl)
-... | there n∈q rewrite ≼-matching q≼p n (here refl) (there n∈q) = refl
-≼-preserves-lookup (ext _ m b q m∉q q≼p) n (there n∈p)
-  = ≼-preserves-lookup q≼p n (there n∈p)
-
-add-cond-preserves-≼ : {p q : Cond} → {n : ℕ} → {b : Bool}
-                     → {n∉p : n ∉ p} → {n∉q : n ∉ q}
-                     → q ≼ p → add-cond n b q n∉q ≼ add-cond n b p n∉p
-add-cond-preserves-≼ (rfl _) = rfl _
-add-cond-preserves-≼ (ext _ n b q n∉q q≼p) = {!!}
-
-add-cond-preserves-≼' : {p q : Cond} → {n : ℕ} → {b : Bool}
-                     → {n∉p : n ∉ p} → (n∈q : n ∈ q) → (lookup q n n∈q ≡ b)
-                     → q ≼ p → q ≼ add-cond n b p n∉p
-add-cond-preserves-≼' n∈q eq q≼p = {!!}
--}
-
-part-size : {p : Cond} → Part p → ℕ
-part-size (whole _) = 1
-part-size (split _ n n∉p I₀ I₁) = part-size I₀ + part-size I₁
-
-part-list : {p : Cond} → Part p → List Cond
-part-list (whole p) = p ∷ []
-part-list (split _ _ _ I₀ I₁) = part-list I₀ ++ part-list I₁ 
+p≼∅ : {p : Cond} → p ≼ ∅
+p≼∅ = λ {_ ()}
 
 part-res : {p : Cond} (q : Cond) → (I : Part p) → q ≼ p → Part q
 part-res q (whole _) q≼p = whole q
@@ -273,5 +223,5 @@ part-res q (split _ n n∉p I₀ I₁) q≼p with n ∈? q
                  (part-res (add-cond n false q n∉q) I₀ (add-cond-preserves-≼ q≼p))
                  (part-res (add-cond n true  q n∉q) I₁ (add-cond-preserves-≼ q≼p))
 ... | yes n∈q with lookup q n n∈q | inspect (lookup q n) n∈q
-...           | false | PE.[ eq ] = part-res q I₀ (add-cond-preserves-≼' n∈q eq q≼p)
-...           | true  | PE.[ eq ] = part-res q I₁ (add-cond-preserves-≼' n∈q eq q≼p)
+...           | false | PE.[ eq ] = part-res q I₀ (add-cond-preserves-≼ʳ n∈q eq q≼p)
+...           | true  | PE.[ eq ] = part-res q I₁ (add-cond-preserves-≼ʳ n∈q eq q≼p)
