@@ -89,7 +89,6 @@ ev {p} (glue {n} {n∉p} {I₀} σ₀ {I₁} σ₁) | glue-prog _ _ = J , τ , g
 modulus-of-continuity : (F : [] ⊢ (N ⇒ B) ⇒ B) → ℕ
 modulus-of-continuity F = μ
   where
-    --⊩Ff : Σ[ I ∈ Part ∅ ] Σ[ b ∈ ∑ B [] I ] (value b × computes (triv (app F generic)) b)
     ⊩Fgeneric-tree : Part ∅
     ⊩Fgeneric-tree = proj₁ (ev (triv (app F generic)))
 
